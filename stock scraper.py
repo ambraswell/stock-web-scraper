@@ -1,3 +1,4 @@
+# pylint: disable=E1101
 from requests import get
 from requests.exceptions import RequestException
 from contextlib import closing
@@ -12,7 +13,7 @@ def simple_get(url):
     try:
         with closing(get(url, stream=True)) as resp:
             if is_good_response(resp):
-                return resp.content
+                return resp.content #pylint places warning error E1101 on this line, states resp has no member resp
             else:
                 return None
 
@@ -52,12 +53,18 @@ def get_tab_data(tab_class):
 
 stocks = ["GE"]
 base_url = "https://finviz.com/quote.ashx?t="
-raw_html = simple_get(base_url + stocks[0])
-html = BeautifulSoup(raw_html, 'html.parser')
-tab_class =  "snapshot-table2"
-tab_dict = get_tab_data(tab_class)
-for k,v in tab_dict.items():
-    print(k,v)
+
+stocklist_data = []
+for stock in stocks:
+    print(stock)
+    raw_html = simple_get(base_url + stock)
+    html = BeautifulSoup(raw_html, 'html.parser')
+    tab_class =  "snapshot-table2"    
+    tab_dict = get_tab_data(tab_class)
+    stocklist_data.append(tab_dict)
+for stock in stocklist_data:
+    for k,v in stock.items():
+        print(k,v)
     
 
 
